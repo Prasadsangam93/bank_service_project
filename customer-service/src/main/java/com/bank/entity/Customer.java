@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor  // ✅ Added this line
+@AllArgsConstructor
 @Table(name = "customers")
 public class Customer {
 
@@ -20,6 +20,8 @@ public class Customer {
     private String email;
 
     private String password;
-    private string phoneNumber;
+    
     private String role;
+
+
 }

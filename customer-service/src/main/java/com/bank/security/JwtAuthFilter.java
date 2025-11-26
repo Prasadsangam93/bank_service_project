@@ -4,12 +4,13 @@ import com.bank.service.CustomUserDetailsService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 @Component
@@ -18,15 +19,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
 
-    public JwtAuthFilter(JwtUtil jwtUtil, CustomUserDetailsService service) {
+    public JwtAuthFilter(JwtUtil jwtUtil, CustomUserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
-        this.userDetailsService = service;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain)
+                                    FilterChain chain)
             throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
@@ -36,6 +37,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (jwtUtil.validate(token)) {
                 String email = jwtUtil.extractEmail(token);
+
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken authToken =
@@ -48,6 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        filterChain.doFilter(request, response);
+
+        chain.doFilter(request, response);
     }
 }

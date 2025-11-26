@@ -16,13 +16,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        Customer customer = repository.findByEmail(email)
+        Customer c = repository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found"));
 
         return User.builder()
-                .username(customer.getEmail())
-                .password(customer.getPassword())
-                .roles(customer.getRole().replace("ROLE_", ""))
+                .username(c.getEmail())
+                .password(c.getPassword())
+                .roles(c.getRole().replace("ROLE_", ""))
                 .build();
     }
 }

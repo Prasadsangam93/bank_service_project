@@ -1,12 +1,12 @@
 server:
-  port: 8081
+  port: 8082
 
 spring:
   application:
-    name: CUSTOMER-SERVICE
+    name: ACCOUNT-SERVICE
 
   datasource:
-    url: jdbc:mysql://localhost:3306/bank_customerdb?createDatabaseIfNotExist=true
+    url: jdbc:mysql://localhost:3306/bank_accountdb?createDatabaseIfNotExist=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver

@@ -5,63 +5,62 @@ import com.bank.entity.Customer;
 import com.bank.repository.CustomerRepository;
 import com.bank.security.JwtUtil;
 import org.springframework.security.authentication.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
 public class CustomerService {
 
-    private final CustomerRepository repository;
-    private final AuthenticationManager authManager;
+    private final CustomerRepository repo;
+    private final AuthenticationManager auth;
     private final PasswordEncoder encoder;
-    private final JwtUtil jwtUtil;
+    private final JwtUtil jwt;
 
-    public CustomerService(CustomerRepository repository,
-                           AuthenticationManager authManager,
+    public CustomerService(CustomerRepository repo,
+                           AuthenticationManager auth,
                            PasswordEncoder encoder,
-                           JwtUtil jwtUtil) {
-        this.repository = repository;
-        this.authManager = authManager;
+                           JwtUtil jwt) {
+        this.repo = repo;
+        this.auth = auth;
         this.encoder = encoder;
-        this.jwtUtil = jwtUtil;
+        this.jwt = jwt;
     }
 
-    public Customer register(RegisterRequest request) {
-        Customer customer = new Customer(
+    public Customer register(RegisterRequest req) {
+        Customer c = new Customer(
                 null,
-                request.getFullName(),
-                request.getEmail(),
-                encoder.encode(request.getPassword()),
-                request.getRole()
+                req.getFullName(),
+                req.getEmail(),
+                encoder.encode(req.getPassword()),
+                req.getRole()
         );
-        return repository.save(customer);
+        return repo.save(c);
     }
 
-    public AuthResponse login(AuthRequest request) {
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+    public AuthResponse login(AuthRequest req) {
 
-        String token = jwtUtil.generateToken(request.getEmail());
-        return new AuthResponse(token, request.getEmail());
+        auth.authenticate(new UsernamePasswordAuthenticationToken(
+                req.getEmail(), req.getPassword()));
+
+        String token = jwt.generateToken(req.getEmail());
+
+        return new AuthResponse(token, req.getEmail());
+    }
+
+    public Customer getById(Long id) {
+        return repo.findById(id).orElseThrow(() ->
+                new RuntimeException("User Not Found"));
     }
 
     public List<Customer> getAll() {
-        return repository.findAll();
+        return repo.findAll();
     }
 
-    public void deleteUser(Long id) {
-        repository.deleteById(id);
+    public Customer getByEmail(String email) {
+        return repo.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found: " + email));
     }
-    public Customer getLoggedInUser() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return repository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User Not Found"));
-    }
-
 }

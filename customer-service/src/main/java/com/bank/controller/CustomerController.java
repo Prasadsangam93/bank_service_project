@@ -5,6 +5,7 @@ import com.bank.entity.Customer;
 import com.bank.service.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -18,29 +19,27 @@ public class CustomerController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Customer> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(service.register(request));
+    public ResponseEntity<Customer> register(@RequestBody RegisterRequest req) {
+        return ResponseEntity.ok(service.register(req));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        return ResponseEntity.ok(service.login(request));
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest req) {
+        return ResponseEntity.ok(service.login(req));
     }
 
-    @GetMapping("/All")
+    @GetMapping("/{id}")
+    public ResponseEntity<Customer> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+
+    @GetMapping("/all")
     public ResponseEntity<List<Customer>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        service.deleteUser(id);
-        return ResponseEntity.ok("User Deleted Successfully");
+    @GetMapping("/email/{email}")
+    public ResponseEntity<Customer> getByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(service.getByEmail(email));
     }
-
-    @GetMapping("/me")
-    public ResponseEntity<Customer> getLoggedInUser() {
-        return ResponseEntity.ok(service.getLoggedInUser());
-    }
-
 }
